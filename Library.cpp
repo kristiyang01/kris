@@ -1,14 +1,18 @@
 #include "Library.h"
 #include <cstdio>
+#include <cstring>
+
+using std::cout;
+using std::endl;
 
 Library::Library(){
-    array = nullptr;
+    Book = nullptr;
     size = 0;
     capacity = 0;
 };
 Library::~Library(){
-    delete[] array;
-    array = nullptr;
+    delete[] Book;
+    Book = nullptr;
 };    
 
 void Library::deleteTextFile(Book& book){
@@ -33,9 +37,100 @@ int Library::findbook(const char* author, const char* title){
     return -1;
 }
 
-int Library::findByCriteria(const char* lhs, const char* rhs){
+void Library::castToLowerCase(char* string){
+    unsigned int len = strlen(string);
+    char offset = 'a' - 'A';
     
+    for(unsigned int i=0; i<len; i++){
+        if(string[i] >= 'A' && string[i] <= 'Z'){
+            string[i] += offset;
+        }
+    }
+
+    return;
 }
+
+bool Library::mystrcmp(const char* str1, char* str2, unsigned int length){
+    unsigned int len1 = strlen(str1);
+    char offset = 'a' - 'A';
+    if(len1 != length){
+        return 0;
+    }
+
+    castToLowerCase(str2);
+    for(unsigned int i=0; i<len1; i++){
+        if(str1[i] != str2[i] && (str1[i] + offset) != str2[i]){
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+bool Library::contains(const char* str1, char* str2, unsigned int length){
+    unsigned int len1 = strlen(str1);
+
+    if(len1 < length){
+        return 0;
+    }
+
+    bool didntbreak;
+    char offset = 'a' - 'A';
+    castToLowerCase(str2);
+
+    for(unsigned int i=0; i<=len1-length; i++){
+        didntbreak = 1;
+        for(unsigned int j=0; j<length; j++){
+            if(str1[i+j] != str2[j] && (str1[i+j] + offset) != str2[j]){
+                didntbreak = 0;            
+                break;
+            }
+        }
+        if(didntbreak){
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+void Library::sortByTitle(unsigned int* array){
+    for(unsigned int i=0; i<size-1; i++){
+        for(unsigned int j=i+1; j<size; j++){
+            if(strcmp(Book[array[i]].title, Book[array[j]].title) > 0){
+                std::swap(array[i], array[j]);
+            }
+        }
+    }
+
+    return;
+}
+
+void Library::sortByAuthor(unsigned int* array){
+    for(unsigned int i=0; i<size-1; i++){
+        for(unsigned int j=i+1; j<size; j++){
+            if(strcmp(Book[array[i]].author, Book[array[j]].author) > 0){
+                std::swap(array[i], array[j]);
+            }
+        }
+    }
+
+    return;
+}
+
+void Library::sortByRating(unsigned int* array){
+    for(unsigned int i=0; i<size-1; i++){
+        for(unsigned int j=i+1; j<size; j++){
+            if(Book[array[i]].rating > Book[array[j]].rating){
+                std::swap(array[i], array[j]);
+            }
+        }
+    }
+
+    return;
+}
+
+///////////////////////////////////////////////////////////////////////////
 
 void Library::sortListOfBooks(bool descending, unsigned short criteria){
     unsigned int* sortIndex = nullptr;
@@ -60,43 +155,57 @@ void Library::sortListOfBooks(bool descending, unsigned short criteria){
 
     if(descending){
         for(unsigned short i=size-1; i>=0; i--){
-            Book[sortIndex[i]].print;  //implement
+            Book[sortIndex[i]].print();  //implement
         }
     }else{
         for(unsigned short i=0; i<size; i++){
-            Book[sortIndex[i]].print;
+            Book[sortIndex[i]].print();
         }
     }
 };
 
-void Library::findBookByCriteria(unsigned short criteria){
+void Library::findBookByCriteria(unsigned short criteria, char* string){
     unsigned int index;
+    unsigned int stringlength = strlen(string);
 
-    if(criteria>3){
-        cout<<"criteria should be 0,1,2 or 3";
-        return;
-    }
-
-    if(criteria == 0){
-        for(unsigned int i=0; i<size; i++){
-            if(strcmp(Book[i].title, title) == 0){
-                index = i;
+    switch(criteria){
+        case 0:
+            for(unsigned int i=0; i<size; i++){
+                if(mystrcmp(Book[i].title, string, stringlength)){
+                    index = i;
+                }
             }
-        }
-    }
-    if(criteria == 1){
-        index = findByAuthor();
-    }
-    if(criteria == 2){
-        index = findByISBN();
-    }
-    if(criteria == 3){
-        index = findByDescription();
+
+        case 1:
+            for(unsigned int i=0; i<size; i++){
+                if(mystrcmp(Book[i].author, string, stringlength)){
+                    index = i;
+                }
+            }
+
+        case 2:
+            for(unsigned int i=0; i<size; i++){
+                if(mystrcmp(Book[i].ISBN, string, stringlength)){
+                    index = i;
+                }
+            }
+
+        case 3:
+            for(unsigned int i=0; i<size; i++){
+                if(contains(Book[i].description, string, stringlength)){
+                    index = i;
+                }
+            }
+                
+        default:
+            cout<<"criteria should be 0,1,2 or 3";
+            return;
     }
 
-    Book[index].fullprint;  //implement
+    Book[index].fullprint();  //implement
     //invalid criteria tbd
-    return;
+    
+    return;   
 }
 void Library::AddBook(const char* author, const char* title, const char *fileName, 
 const char* description, short unsigned rating, const char* ISBN, bool admin){
@@ -107,21 +216,21 @@ const char* description, short unsigned rating, const char* ISBN, bool admin){
     }
 
     if(size == capacity){
-        Book* newarray = nullptr;
-        newarray = new Book[capacity*2];
-        if(newarray == nullptr){
-            throw "Memory allocation problem" //tbd
+        Book* newBook = nullptr;
+        newBook = new Book[capacity*2];
+        if(newBook == nullptr){
+            throw "Memory allocation problem"; //tbd
             return;
         }
         capacity = capacity*2;
         for(unsigned int i=0; i<size; i++){
-            newarray[i] = array[i]; //need operator=
+            newBook[i] = Book[i]; //need operator=
         }
-        delete[] array;
-        array = newarray;
-        newarray = nullptr;
+        delete[] Book;
+        Book = newBook;
+        newBook = nullptr;
     }
-    array[size] = Book(author, title, fileName, description, rating, ISBN); //need constructor
+    Book[size] = Book(author, title, fileName, description, rating, ISBN); //need constructor
     size++;
 
     return;
@@ -146,6 +255,6 @@ void Library::RemoveBook(const char* author, const char* title, bool admin){
 
     return;
 }
-void Library::PrintBook(){
+// void Library::PrintBook(){
 
-}
+// }
