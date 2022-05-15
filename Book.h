@@ -12,7 +12,7 @@ private:
     short unsigned rating = 0;
     char* ISBN = nullptr;
 
-    void setString(char* destination, const char* source);
+    void setString(char*& destination, const char* source);
     void setRating(short unsigned rating);
 
 public:
@@ -22,8 +22,11 @@ public:
     Book& operator=(const Book& other);
     ~Book();
 
+    friend std::ostream& operator<<(std::ostream& out, const Book& book);
+
     void print();
     void fullprint();
+
 
     friend class Library;
 };

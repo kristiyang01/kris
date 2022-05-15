@@ -4,7 +4,7 @@
 using std::endl;
 using std::cout;
 
-void Book::setString(char* destination, const char* source){
+void Book::setString(char*& destination, const char* source){
     destination = new char[strlen(source) + 1];
     if(destination == nullptr){
         throw "Memory allocation error!";
@@ -70,9 +70,13 @@ Book::~Book(){
         delete[] ISBN;
 }
 
+std::ostream& operator<<(std::ostream& out, const Book& book){
+    out<<book.author<<" "<<book.title<<" "<<book.fileName<<" "<<book.description<<" "<<book.rating<<" "<<book.ISBN;
+    return out;
+}
+
 void Book::print(){
-    cout<<title<<" written by "<<author<<"has ISBN:"<<ISBN<<endl;
-    
+    cout<<title<<" written by "<<author<<" has ISBN:"<<ISBN<<endl;
     return;
 }
 
@@ -85,3 +89,4 @@ void Book::fullprint(){
 
     return;
 }
+
