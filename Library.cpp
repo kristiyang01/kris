@@ -6,13 +6,13 @@ using std::cout;
 using std::endl;
 
 Library::Library(){
-    Book = nullptr;
+    books = nullptr;
     size = 0;
     capacity = 0;
 };
 Library::~Library(){
-    delete[] Book;
-    Book = nullptr;
+    delete[] books;
+    books = nullptr;
 };    
 
 void Library::deleteTextFile(Book& book){
@@ -20,7 +20,7 @@ void Library::deleteTextFile(Book& book){
     if(result == 0){
         cout<<"File deletion completed!";
     }else{
-        cerr<<"File deletion failed!";
+        std::cerr<<"File deletion failed!";
     }
 
     return;
@@ -28,8 +28,8 @@ void Library::deleteTextFile(Book& book){
 
 int Library::findbook(const char* author, const char* title){
     for(unsigned int i=0; i<size; i++){
-        if(strcmp(Book[i].title, title) == 0){
-            if(strcmp(Book[i].author, author) == 0){
+        if(strcmp(books[i].title, title) == 0){
+            if(strcmp(books[i].author, author) == 0){
                 return i;
             }
         }
@@ -97,7 +97,7 @@ bool Library::contains(const char* str1, char* str2, unsigned int length){
 void Library::sortByTitle(unsigned int* array){
     for(unsigned int i=0; i<size-1; i++){
         for(unsigned int j=i+1; j<size; j++){
-            if(strcmp(Book[array[i]].title, Book[array[j]].title) > 0){
+            if(strcmp(books[array[i]].title, books[array[j]].title) > 0){
                 std::swap(array[i], array[j]);
             }
         }
@@ -109,7 +109,7 @@ void Library::sortByTitle(unsigned int* array){
 void Library::sortByAuthor(unsigned int* array){
     for(unsigned int i=0; i<size-1; i++){
         for(unsigned int j=i+1; j<size; j++){
-            if(strcmp(Book[array[i]].author, Book[array[j]].author) > 0){
+            if(strcmp(books[array[i]].author, books[array[j]].author) > 0){
                 std::swap(array[i], array[j]);
             }
         }
@@ -121,7 +121,7 @@ void Library::sortByAuthor(unsigned int* array){
 void Library::sortByRating(unsigned int* array){
     for(unsigned int i=0; i<size-1; i++){
         for(unsigned int j=i+1; j<size; j++){
-            if(Book[array[i]].rating > Book[array[j]].rating){
+            if(books[array[i]].rating > books[array[j]].rating){
                 std::swap(array[i], array[j]);
             }
         }
@@ -155,13 +155,15 @@ void Library::sortListOfBooks(bool descending, unsigned short criteria){
 
     if(descending){
         for(unsigned short i=size-1; i>=0; i--){
-            Book[sortIndex[i]].print();  //implement
+            books[sortIndex[i]].print();  //implement
         }
     }else{
         for(unsigned short i=0; i<size; i++){
-            Book[sortIndex[i]].print();
+            books[sortIndex[i]].print();
         }
     }
+
+    return;
 };
 
 void Library::findBookByCriteria(unsigned short criteria, char* string){
@@ -171,28 +173,28 @@ void Library::findBookByCriteria(unsigned short criteria, char* string){
     switch(criteria){
         case 0:
             for(unsigned int i=0; i<size; i++){
-                if(mystrcmp(Book[i].title, string, stringlength)){
+                if(mystrcmp(books[i].title, string, stringlength)){
                     index = i;
                 }
             }
 
         case 1:
             for(unsigned int i=0; i<size; i++){
-                if(mystrcmp(Book[i].author, string, stringlength)){
+                if(mystrcmp(books[i].author, string, stringlength)){
                     index = i;
                 }
             }
 
         case 2:
             for(unsigned int i=0; i<size; i++){
-                if(mystrcmp(Book[i].ISBN, string, stringlength)){
+                if(mystrcmp(books[i].ISBN, string, stringlength)){
                     index = i;
                 }
             }
 
         case 3:
             for(unsigned int i=0; i<size; i++){
-                if(contains(Book[i].description, string, stringlength)){
+                if(contains(books[i].description, string, stringlength)){
                     index = i;
                 }
             }
@@ -202,7 +204,7 @@ void Library::findBookByCriteria(unsigned short criteria, char* string){
             return;
     }
 
-    Book[index].fullprint();  //implement
+    books[index].fullprint();  //implement
     //invalid criteria tbd
     
     return;   
@@ -211,8 +213,17 @@ void Library::AddBook(const char* author, const char* title, const char *fileNam
 const char* description, short unsigned rating, const char* ISBN, bool admin){
     
     if(!admin){
-        cout<<"Unauthorized access";
+        cout<<"Unauthorized access"<<endl;
         return;
+    }
+
+    if(size == capacity && size == 0){
+        capacity = 100;
+        books = new Book[capacity];
+        if(books == nullptr){
+            throw "Memory allocation problem"; //tbd
+            return;
+        }
     }
 
     if(size == capacity){
@@ -224,13 +235,14 @@ const char* description, short unsigned rating, const char* ISBN, bool admin){
         }
         capacity = capacity*2;
         for(unsigned int i=0; i<size; i++){
-            newBook[i] = Book[i]; //need operator=
+            newBook[i] = books[i]; //need operator=
         }
-        delete[] Book;
-        Book = newBook;
+        delete[] books;
+        books = newBook;
         newBook = nullptr;
     }
-    Book[size] = Book(author, title, fileName, description, rating, ISBN); //need constructor
+    
+    books[size] = Book(author, title, fileName, description, rating, ISBN); //need constructor
     size++;
 
     return;
@@ -238,16 +250,16 @@ const char* description, short unsigned rating, const char* ISBN, bool admin){
 void Library::RemoveBook(const char* author, const char* title, bool admin){
     
     if(!admin){
-        cout<<"Unauthorized access";
+        cout<<"Unauthorized access"<<endl;
         return;
     } 
     
     int index = findbook(author, title);
     if(index >= 0){ // to implement
-        deleteTextFile(Book[index]); // to implement
+        deleteTextFile(books[index]); // to implement
         if(index < size-1){
             for(unsigned int i=index; i<size-1; i++){
-                Book[i] = Book[i+1];
+                books[i] = books[i+1];
             }
         }
         size--;
@@ -255,6 +267,29 @@ void Library::RemoveBook(const char* author, const char* title, bool admin){
 
     return;
 }
-// void Library::PrintBook(){
-
+// void Library::PrintBook(unsigned int bookindex, bool mode, unsigned int count){
+    
 // }
+
+
+const unsigned int Library::getSize() const{
+    return size;
+}
+
+void Library::saveInFile(const char* textFile){
+    
+    std::ofstream out;
+    
+    out.open(textFile, std::ios::app);
+    if(out){
+        for(unsigned int i=0; i<size; i++){
+            out.seekp(0, std::ios::end);
+            out<<books[i]<<endl;
+        }
+    }
+    out.close();
+
+    return;
+}
+
+

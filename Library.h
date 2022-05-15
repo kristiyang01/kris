@@ -3,11 +3,12 @@
 
 #include "Book.h"
 #include <iostream>
+#include <fstream>
 
 
 class Library{
 private:
-    Book* Book;
+    Book* books;
     unsigned int size;
     unsigned int capacity;
 
@@ -24,16 +25,24 @@ private:
     void sortByTitle(unsigned int* array);
     void sortByAuthor(unsigned int* array);
     void sortByRating(unsigned int* array);
+
 public:
     Library();
     ~Library();    
 
     void sortListOfBooks(bool descending, unsigned short criteria);
     void findBookByCriteria(unsigned short criteria, char* string);
-    void AddBook(const char* author, const char* title, const char *fileName, 
+    void AddBook(const char* author, const char* title, const char* fileName, 
                 const char* description, short unsigned rating, const char* ISBN, bool admin);
     void RemoveBook(const char* author, const char* title, bool admin);
     // void PrintBook();
+
+    void saveInFile(const char* textFile);
+
+    const unsigned int getSize() const;
+    
+
+
 };
 
 
