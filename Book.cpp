@@ -75,6 +75,7 @@ std::ostream& operator<<(std::ostream& out, const Book& book){
     return out;
 }
 
+
 void Book::print(){
     cout<<title<<" written by "<<author<<" has ISBN:"<<ISBN<<endl;
     return;

@@ -267,7 +267,7 @@ void Library::RemoveBook(const char* author, const char* title, bool admin){
 
     return;
 }
-// void Library::PrintBook(unsigned int bookindex, bool mode, unsigned int count){
+// void Library::PrintBook(){
     
 // }
 
