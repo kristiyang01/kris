@@ -1,7 +1,7 @@
-#pragma once
+#ifndef BOOK_H
+#define BOOK_H
+
 #include <iostream>
-
-
 
 class Book{
 private:
@@ -21,4 +21,11 @@ public:
     Book(const char* author, const char* title, const char *fileName, const char* description, short unsigned rating, const char* ISBN);
     Book& operator=(const Book& other);
     ~Book();
+
+    void print();
+    void fullprint();
+
+    friend class Library;
 };
+
+#endif

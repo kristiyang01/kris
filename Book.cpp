@@ -1,4 +1,8 @@
 #include "Book.h"
+#include <string.h>
+
+using std::endl;
+using std::cout;
 
 void Book::setString(char* destination, const char* source){
     destination = new char[strlen(source) + 1];
@@ -12,9 +16,9 @@ void Book::setString(char* destination, const char* source){
 
 void Book::setRating(short unsigned rating){
     if(rating >= 0 && rating <=10){
-        this.rating = rating;
+        this->rating = rating;
     }else{
-        this.rating = 0;
+        this->rating = 0;
     }
     return;
 }
@@ -30,15 +34,13 @@ Book::Book(){
 
 Book::Book(const char* author, const char* title, const char *fileName, const char* description, short unsigned rating, const char* ISBN){
     
-    setString(this.author, author);
-    setString(this.title, title);
-    setString(this.fileName, fileName);
-    setString(this.description, description);
-    setString(this.ISBN, ISBN);
+    setString(this->author, author);
+    setString(this->title, title);
+    setString(this->fileName, fileName);
+    setString(this->description, description);
+    setString(this->ISBN, ISBN);
 
     setRating(rating);
-    
-    
 }
 
 Book& Book::operator=(const Book& other){
@@ -49,11 +51,11 @@ Book& Book::operator=(const Book& other){
         delete[] description;
         delete[] ISBN;
 
-        setString(this.author, other.author);
-        setString(this.title, other.title);
-        setString(this.fileName, other.fileName);
-        setString(this.description, other.description);
-        setString(this.ISBN, other.ISBN);
+        setString(this->author, other.author);
+        setString(this->title, other.title);
+        setString(this->fileName, other.fileName);
+        setString(this->description, other.description);
+        setString(this->ISBN, other.ISBN);
 
         setRating(other.rating);
     }
@@ -66,4 +68,20 @@ Book::~Book(){
         delete[] fileName;
         delete[] description;
         delete[] ISBN;
+}
+
+void Book::print(){
+    cout<<title<<" written by "<<author<<"has ISBN:"<<ISBN<<endl;
+    
+    return;
+}
+
+void Book::fullprint(){
+    cout<<title<<" written by "<<author<<" has "<<rating<<" rating ";
+    cout<<endl;
+    cout<<"The book's ISBN is: "<<ISBN;
+    cout<<endl;
+    cout<<"Here is a short description of what the book is about: "<<description;
+
+    return;
 }
